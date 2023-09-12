@@ -205,10 +205,26 @@ node-2  /dev/vdb  hdd              53.6G  No         20m ago    Insufficient spa
 node-3  /dev/vdb  hdd              53.6G  No         20m ago    Insufficient space (<10 extents) on vgs, LVM detected, locked
 ```
 
-Login to the node and run the following command:
+Login to the node, find the device name and remove the LVM metadata:
 
 ```shell
+# On every node
+dmsetup remove dmsetup info | grep Name | awk '{print $2}'
 wipefs -a <DEVICE> # Replace <DEVICE> with the device name, for example /dev/vdc.
 ```
 
+Now you should see the device in the list:
+
+```shell
+ceph orch device ls
+```
+
+Output example:
+
+```shell
+HOST    PATH      TYPE  DEVICE ID   SIZE  AVAILABLE  REFRESHED  REJECT REASONS
+node-1  /dev/vdc  hdd              53.6G  Yes        20m ago
+node-2  /dev/vdb  hdd              53.6G  Yes        20m ago
+node-3  /dev/vdb  hdd              53.6G  Yes        20m ago
+```
 
