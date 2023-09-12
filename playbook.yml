@@ -1,0 +1,93 @@
+---
+- hosts: all
+  name: Prepare the system
+  become: yes
+  tasks:
+
+    - name: Check if the system is updated
+      stat:
+        path: /var/lib/apt/periodic/update-success-stamp
+      register: system_updated
+      changed_when: false
+      failed_when: false
+
+    - name: Update the system
+      apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 3600
+        force_apt_get: yes
+        autoremove: yes
+        autoclean: yes
+      when: not system_updated.stat.exists
+
+    - name: Set the timezone
+      timezone:
+        name: "{{ timezone }}"
+
+    - name: Set the hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Populate inventory into hosts file
+      blockinfile:
+        path: /etc/hosts
+        block: |
+          {% for host in groups['all'] %}
+          {% if hostvars[host]['inventory_hostname'] != inventory_hostname %}
+          {{ hostvars[host]['ip'] }} {{ hostvars[host]['inventory_hostname'] }}
+          {% endif %}
+          {% endfor %}
+        state: present
+      when: groups['all'] | length > 1
+
+    - name: Set domain names for 127.0.0.1
+      lineinfile:
+        path: /etc/hosts
+        regexp: "^127.0.0.1"
+        line: "127.0.0.1 localhost {{ inventory_hostname }}"
+        state: present
+
+    - name: Check if Docker is installed
+      stat:
+        path: /usr/bin/docker
+      register: docker_installed
+      changed_when: false
+      failed_when: false
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: latest
+      when: not docker_installed.stat.exists
+
+    - name: Check if Cephadm is installed
+      stat:
+        path: /usr/sbin/cephadm
+      register: cephadm_installed
+      changed_when: false
+      failed_when: false
+
+    - name: Install Cephadm
+      apt:
+        name: cephadm
+        state: latest
+      when: not cephadm_installed.stat.exists
+
+    - name: Install ceph-common
+      apt:
+        name: ceph-common
+        state: latest
+
+    - name: Reboot all nodes
+      reboot:
+        reboot_timeout: 300
+        reboot_msg: "Reboot initiated by Ansible for {{ inventory_hostname }}"
+      when: reboot_required | default(false)
+
+    - name: Wait for the system to reboot
+      wait_for_connection:
+        delay: 30
+        timeout: 300
+        sleep: 5
+      when: reboot_required | default(false)
