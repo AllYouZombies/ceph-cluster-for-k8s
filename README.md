@@ -12,7 +12,7 @@
 ### Clone the repository and install dependencies
 
 ```shell
-git clone https://gitlab.anttek.io/devops/ceph-cluster.git
+git clone https://gitlab.anttek.io/devops/ceph-cluster-for-k8s.git ceph-cluster
 cd ceph-cluster
 python3 -m venv venv
 ```
