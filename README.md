@@ -211,7 +211,8 @@ Login to the node, find the device name and remove the LVM metadata:
 
 ```shell
 # On every node
-dmsetup remove dmsetup info | grep Name | awk '{print $2}'
+dmsetup info
+dmsetup remove <NAME> # Replace <NAME> with the device name, for example ceph--<UUID>.
 wipefs -a <DEVICE> # Replace <DEVICE> with the device name, for example /dev/vdc.
 ```
 
