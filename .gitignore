@@ -3,3 +3,5 @@
 venv
 
 cluster/
+
+k8s/

@@ -5,9 +5,9 @@ data:
   config.json: |-
     [
       {
-        "clusterID": "4c6191fc-511e-11ee-9219-211a9ef6d737",
+        "clusterID": "4c6191fc-112g-99aa-9219-555a9ef6d999",
         "monitors": [
-          "91.186.199.97:6789"
+          "1.1.1.1:6789"
         ]
       }
     ]
