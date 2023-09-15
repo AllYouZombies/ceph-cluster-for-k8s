@@ -75,6 +75,8 @@ Copy first node's SSH key to the other nodes:
 
 ```shell
 ceph cephadm get-pub-key > ~/.ssh/id_rsa.pub
+ssh-copy-id -i ~/.ssh/id_rsa.pub <NODE_2_IP>
+ssh-copy-id -i ~/.ssh/id_rsa.pub <NODE_3_IP>
 ```
 
 Add the other nodes to the cluster:
